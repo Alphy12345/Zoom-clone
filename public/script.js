@@ -1,57 +1,85 @@
 const socket = io('/')
 const videoGrid = document.getElementById('video-grid')
-const myPeer = new Percent(undefined, {
-    host: '/',
-    port: '3001'
-
+const myPeer = new Peer(undefined, {
+    path: '/peerjs',
+    host: 'localhost',
+    port: 3000
 })
+
 const myVideo = document.createElement('video')
 myVideo.muted = true
 const peers = {}
+
+console.log('🎬 Script loaded')
+
+myPeer.on('open', id => {
+    console.log('🆔 My peer ID:', id)
+    socket.emit('join-room', ROOM_ID, id)
+})
+
+myPeer.on('error', err => {
+    console.error('❌ PeerJS error:', err)
+})
+
+socket.on('connect', () => {
+    console.log('✅ Socket connected')
+})
 
 navigator.mediaDevices.getUserMedia({
     video: true,
     audio: true
 }).then(stream => {
-   addVideoStream(myVideo, stream)
+    console.log('📹 Got local stream')
+    addVideoStream(myVideo, stream)
     
-   myPeer.on('call', call =>{
-    call.answer(stream)
-     const video = document.createElement('video')
-    call.on('stream', userVideoStream =>{
-      addVideoStream(video, userVideoStream)
+    myPeer.on('call', call => {
+        console.log('📞 Receiving call from:', call.peer)
+        call.answer(stream)
+        const video = document.createElement('video')
+        call.on('stream', userVideoStream => {
+            console.log('📺 Receiving stream from:', call.peer)
+            addVideoStream(video, userVideoStream)
+        })
     })
-   })
 
-   socket.on('user-connected: ' , userId => {
-      connectToNewUser(userId, stream)
-   })
+    socket.on('user-connected', userId => {
+        console.log('👥 User connected:', userId)
+        setTimeout(() => {
+            connectToNewUser(userId, stream)
+        }, 1000)
+    })
+}).catch(err => {
+    console.error('❌ Error getting media:', err)
 })
 
 socket.on('user-disconnected', userId => {
-  if  (peers[userIdSS]) peers[userId].close()
-})
-
-myPeer.on('open')
-socket.emit('join-room', ROOM_ID, 10)
-
-socket.on('user-connected', userId => {
-    console.log('User connected: ' + userId )
+    console.log('👋 User disconnected:', userId)
+    if (peers[userId]) {
+        peers[userId].close()
+    }
 })
 
 function connectToNewUser(userId, stream) {
+    console.log('📲 Calling new user:', userId)
     const call = myPeer.call(userId, stream)
     const video = document.createElement('video')
+    
     call.on('stream', userVideoStream => {
+        console.log('✅ Got stream from user:', userId)
         addVideoStream(video, userVideoStream)
     })
+    
     call.on('close', () => {
+        console.log('🔌 Call closed with:', userId)
         video.remove()
     })
+    
+    call.on('error', err => {
+        console.error('❌ Call error with', userId, ':', err)
+    })
 
-   peers[userId] = call 
+    peers[userId] = call 
 }
-
 
 function addVideoStream(video, stream) {
     video.srcObject = stream
@@ -59,4 +87,5 @@ function addVideoStream(video, stream) {
         video.play()
     })
     videoGrid.append(video)
+    console.log('📊 Video added! Total videos:', videoGrid.children.length)
 }

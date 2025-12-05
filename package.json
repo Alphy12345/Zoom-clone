@@ -2,7 +2,7 @@
   "name": "zoom-clone",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "server.js",
   "scripts": {
     "devStart": "nodemon server.js"
   },
@@ -12,11 +12,12 @@
   "type": "commonjs",
   "dependencies": {
     "ejs": "^3.1.10",
-    "express": "^5.2.1",
-    "socket.io": "^4.8.1",
-    "uuid": "^13.0.0"
+    "express": "^4.18.2",
+    "peer": "^1.0.2",
+    "socket.io": "^4.5.4",
+    "uuid": "^9.0.0"
   },
   "devDependencies": {
-    "nodemon": "^3.1.11"
+    "nodemon": "^3.0.1"
   }
 }
