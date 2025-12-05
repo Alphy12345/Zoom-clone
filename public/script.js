@@ -1,14 +1,16 @@
 const socket = io('/')
 const videoGrid = document.getElementById('video-grid')
 
-// Auto-detect if we're on localhost or production
-const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+// Smart configuration that works everywhere
+const protocol = window.location.protocol
+const hostname = window.location.hostname
+const port = window.location.port
 
 const myPeer = new Peer(undefined, {
     path: '/peerjs',
-    host: isLocalhost ? 'localhost' : window.location.hostname,
-    port: isLocalhost ? 3000 : 443,
-    secure: !isLocalhost
+    host: hostname,
+    port: protocol === 'https:' ? (port || 443) : (port || 3000),
+    secure: protocol === 'https:'
 })
 
 const myVideo = document.createElement('video')
@@ -16,6 +18,7 @@ myVideo.muted = true
 const peers = {}
 
 console.log('🎬 Script loaded')
+console.log('🌐 Connecting to:', hostname, 'Port:', port || (protocol === 'https:' ? 443 : 3000))
 
 myPeer.on('open', id => {
     console.log('🆔 My peer ID:', id)
