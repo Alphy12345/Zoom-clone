@@ -1,46 +1,45 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Zoom Clone - Video Chat</title>
-    <script>
-        const ROOM_ID = "<%= roomId %>"
-    </script>
-    <script defer src="https://unpkg.com/peerjs@1.3.1/dist/peerjs.min.js"></script>
-    <script src="/socket.io/socket.io.js" defer></script>
-    <script src="script.js" defer></script>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Zoom Clone - Video Chat</title>
+  <script>
+    const ROOM_ID = "<%= roomId %>";
+    // SIGNALING_SERVER will be like https://your-railway-app.up.railway.app
+    const SIGNALING_SERVER = "<%= SIGNALING_SERVER %>";
+  </script>
 
-        body {
-            background: #1c1e20;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
+  <script defer src="https://unpkg.com/peerjs@1.3.1/dist/peerjs.min.js"></script>
+  <script src="/socket.io/socket.io.js" defer></script>
+  <script src="/script.js" defer></script>
 
-        #video-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            grid-auto-rows: 300px;
-            gap: 10px;
-            padding: 10px;
-        }
-
-        video {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            background: #000;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
-        }
-    </style>
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { background:#1c1e20; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color:#fff; }
+    header { display:flex; gap:8px; align-items:center; padding:12px; }
+    #controls { margin-left:auto; display:flex; gap:8px; }
+    button { background:#2b2f33; border:none; color:#fff; padding:8px 12px; border-radius:6px; cursor:pointer; }
+    #video-grid { display:grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); grid-auto-rows: 300px; gap:10px; padding:10px; }
+    video { width:100%; height:100%; object-fit:cover; background:#000; border-radius:8px; box-shadow:0 4px 6px rgba(0,0,0,0.3); }
+    #record-indicator { width:10px; height:10px; border-radius:50%; background:transparent; display:inline-block; margin-left:6px; }
+    #download-link { color:#0af; text-decoration:underline; }
+  </style>
 </head>
 <body>
-    <div id="video-grid"></div>
+  <header>
+    <h3>Room: <span id="room-label"><%= roomId %></span></h3>
+    <div id="controls">
+      <button id="start-record">Start Recording</button>
+      <button id="stop-record" disabled>Stop Recording</button>
+      <span id="record-indicator"></span>
+      <a id="download-link" style="display:none" download="recording.webm">Download Recording</a>
+    </div>
+  </header>
+
+  <div id="video-grid"></div>
+
+  <!-- canvas used for recording — hidden -->
+  <canvas id="record-canvas" style="display:none"></canvas>
 </body>
 </html>
