@@ -1,9 +1,14 @@
 const socket = io('/')
 const videoGrid = document.getElementById('video-grid')
+
+// Auto-detect if we're on localhost or production
+const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+
 const myPeer = new Peer(undefined, {
     path: '/peerjs',
-    host: 'localhost',
-    port: 3000
+    host: isLocalhost ? 'localhost' : window.location.hostname,
+    port: isLocalhost ? 3000 : 443,
+    secure: !isLocalhost
 })
 
 const myVideo = document.createElement('video')
@@ -50,6 +55,7 @@ navigator.mediaDevices.getUserMedia({
     })
 }).catch(err => {
     console.error('❌ Error getting media:', err)
+    alert('Please allow camera and microphone access!')
 })
 
 socket.on('user-disconnected', userId => {
